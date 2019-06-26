@@ -1,3 +1,4 @@
+
 import { Author, View, FortuneCookie } from './connectors';
 
 const resolvers = {

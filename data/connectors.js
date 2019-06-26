@@ -1,27 +1,28 @@
 import Sequelize from 'sequelize';
 import casual from 'casual';
 import _ from 'lodash';
+import fetch from 'node-fetch';
 import Mongoose from 'mongoose';
 
 const db = new Sequelize('blog', null, null, {
   dialect: 'sqlite',
-  storage: './blog.sqlite',
+  storage: './blog.sqlite'
 });
 
 const AuthorModel = db.define('author', {
   firstName: { type: Sequelize.STRING },
-  lastName: { type: Sequelize.STRING },
+  lastName: { type: Sequelize.STRING }
 });
 
 const PostModel = db.define('post', {
-    title: { type: Sequelize.STRING },
-    text: { type: Sequelize.STRING },
-  });
-  
-  AuthorModel.hasMany(PostModel);
-  PostModel.belongsTo(AuthorModel);
-  
-  Mongoose.Promise = global.Promise;
+  title: { type: Sequelize.STRING },
+  text: { type: Sequelize.STRING }
+});
+
+AuthorModel.hasMany(PostModel);
+PostModel.belongsTo(AuthorModel);
+
+Mongoose.Promise = global.Promise;
 
 const mongo = Mongoose.connect('mongodb://localhost/views', {
   useMongoClient: true
@@ -34,6 +35,7 @@ const ViewSchema = Mongoose.Schema({
 
 const View = Mongoose.model('views', ViewSchema);
 
+// modify the mock data creation to also create some views:
 casual.seed(123);
 db.sync({ force: true }).then(() => {
   _.times(10, () => {
@@ -59,7 +61,17 @@ db.sync({ force: true }).then(() => {
   });
 });
 
-  const Author = db.models.author;
-  const Post = db.models.post;
-  
-  export { Author, Post, View };  
+const FortuneCookie = {
+  getOne() {
+    return fetch('http://fortunecookieapi.herokuapp.com/v1/cookie')
+      .then(res => res.json())
+      .then(res => {
+        return res[0].fortune.message;
+      });
+  }
+};
+
+const Author = db.models.author;
+const Post = db.models.post;
+
+export { Author, Post, View, FortuneCookie };
